@@ -1,3 +1,5 @@
+import {POWER_SUM} from "./heating_rules";
+
 export class ItemMap {
     values = new Map();
 
@@ -7,6 +9,10 @@ export class ItemMap {
 
     getItem(name) {
         return this.values.get(name);
+    }
+
+    power(value) {
+        this.addItem(POWER_SUM, new Item(value))
     }
 }
 export class Item {
