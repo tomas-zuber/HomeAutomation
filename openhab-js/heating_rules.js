@@ -11,25 +11,27 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 */
 export const POWER_SUM = "PowerSum";
 
-export const AIR_HEAT_STATUS = "Rekup_heat_status";
-export const AIR_HEAT_AUTO = "Rekup_heat_auto";
-export const AIR_POWER = "Rekup_power";
-export const AIR_HEAT_SWITCH = "Rekup_heat_switch";
+export const AIR_HEAT_STATUS = "Rekup_heat_status"; // ON/OFF
+export const AIR_HEAT_AUTO = "Rekup_heat_auto"; // ON/OFF
+export const AIR_HEAT_SWITCH = "Rekup_heat_switch"; // toggle
 export const AIR_POWER_LIMIT = -450;
 
-export const PLUG1_POWER = "shellyplug__1921680202_Power_Consumption";
-export const PLUG1_SWITCH = "shellyplug__1921680202_Power";
-export const PLUG1_AUTO = "Switch1_auto";
+export const PLUG1_SWITCH = "shellyplug__1921680202_Power"; // ON/OFF
+export const PLUG1_AUTO = "Switch1_auto"; // ON/OFF
 
 export const ON = "ON";
 export const OFF = "OFF";
 
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
+    let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState;
+    // let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState;
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
-    if (powerSum <= AIR_POWER_LIMIT && airHeatSwitch.rawState === OFF) {
+
+    // if (airHeatAuto === ON) ...
+    if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
         airHeatSwitch.sendCommand(ON)
-    } else if (powerSum > AIR_POWER_LIMIT && airHeatSwitch.rawState === ON) {
+    } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
         airHeatSwitch.sendCommand(OFF)
     }
 }
