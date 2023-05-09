@@ -1,14 +1,15 @@
-describe("Filter function", () => {
-    test("it should filter by a search term (link)", () => {
-        const input = [
-            { id: 1, url: "https://www.url1.dev" },
-            { id: 2, url: "https://www.url2.dev" },
-            { id: 3, url: "https://www.link3.dev" }
-        ];
+import {Item, ItemMap} from "../classes";
+import {AIR_HEAT_SWITCH, OFF, ON, POWER_SUM, updateHeating} from "../heating_rules";
+import expect from "expect";
 
-        const output = [{ id: 3, url: "https://www.link3.dev" }];
+describe("updateHeating function", () => {
+    test("turn on air heater if turned off and powerSum is enough", () => {
+        const items = new ItemMap();
+        items.addItem(POWER_SUM, new Item(-1000));
+        items.addItem(AIR_HEAT_SWITCH, new Item(OFF));
 
-        expect(filterByTerm(input, "link")).toEqual(output);
+        updateHeating(items);
 
+        expect(items.getItem(AIR_HEAT_SWITCH).rawState).toEqual(ON);
     });
 });
