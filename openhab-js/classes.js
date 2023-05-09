@@ -11,6 +11,8 @@ export class ItemMap {
 }
 export class Item {
     rawState;
+    spy; // used for testing
+
     constructor(value) {
         this.rawState = value;
     }

@@ -25,13 +25,14 @@ export const OFF = "OFF";
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
     let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState;
-    // let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState;
+    let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState;
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
 
-    // if (airHeatAuto === ON) ...
-    if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-        airHeatSwitch.sendCommand(ON)
-    } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
-        airHeatSwitch.sendCommand(OFF)
+    if (airHeatAuto === ON) {
+        if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
+            airHeatSwitch.sendCommand(0)
+        } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
+            airHeatSwitch.sendCommand(0)
+        }
     }
 }
