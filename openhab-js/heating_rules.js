@@ -27,8 +27,7 @@ export const OFF = "OFF";
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
-    if (powerSum < AIR_POWER_LIMIT && airHeatSwitch.rawState === OFF) {
+    if (powerSum <= AIR_POWER_LIMIT && airHeatSwitch.rawState === OFF) {
         airHeatSwitch.sendCommand(ON)
     }
-    // TODO implement
 }
