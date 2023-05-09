@@ -35,6 +35,7 @@ describe('updateHeating tests', () => {
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
             expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
         });
+
         it.each([
             [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(OFF), true, ON],
             [itemMap(BOILER_LOW_POWER).boilerAuto(ON).boilerStatus(ON), true, OFF],
@@ -51,6 +52,21 @@ describe('updateHeating tests', () => {
             expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
             expect(items.getItem(BOILER_SWITCH).rawState).toEqual(newState);
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
+        });
+
+        it.each([
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER - 1)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(OFF),
+                true, false, OFF],
+            // TODO continue here
+
+        ])('updateHeating for air & boiler %p', (items, airUpdated, boilerUpdated, boilerNewState) => {
+            updateHeating(items)
+
+            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(airUpdated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(boilerUpdated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(boilerNewState);
         });
     }
 )
