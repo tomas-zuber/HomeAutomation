@@ -22,8 +22,9 @@ export const AIR_HEAT_AUTO = "Rekup_heat_auto"; // ON/OFF
 export const AIR_HEAT_SWITCH = "Rekup_heat_switch"; // toggle
 export const AIR_POWER_LIMIT = -450;
 
-export const PLUG1_SWITCH = "shellyplug__1921680202_Power"; // ON/OFF
-export const PLUG1_AUTO = "Switch1_auto"; // ON/OFF
+export const BOILER_AUTO = "Switch1_auto"; // ON/OFF
+export const BOILER_SWITCH = "shellyplug__1921680202_Power"; // ON/OFF
+export const BOILER_POWER_LIMIT = -600;
 
 export const ON = "ON";
 export const OFF = "OFF";
@@ -34,8 +35,8 @@ function switchAirHeat(items) {
 }
 
 export function updateHeating(items) {
-    let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState;
-    let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState;
+    let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
+    let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
 
     if (airHeatAuto === ON) {
         let powerSum = items.getItem(POWER_SUM).rawState
