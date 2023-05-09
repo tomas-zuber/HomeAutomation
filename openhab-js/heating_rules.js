@@ -34,5 +34,9 @@ export function updateHeating(items) {
         } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
             airHeatSwitch.sendCommand(0)
         }
+    } else {
+        if (airHeatStatus === ON) {
+            airHeatSwitch.sendCommand(0)
+        }
     }
 }

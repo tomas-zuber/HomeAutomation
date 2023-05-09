@@ -26,7 +26,8 @@ describe('updateHeating tests', () => {
             [createItems(AIR_HEAT_ENOUGH_POWER, ON), 0],
             // airHeatAuto = OFF
             [createItems(AIR_HEAT_ENOUGH_POWER, OFF, OFF), 0],
-            [createItems(AIR_HEAT_LOW_POWER, ON, OFF), 0],
+            [createItems(AIR_HEAT_ENOUGH_POWER, ON, OFF), 1],
+            [createItems(AIR_HEAT_LOW_POWER, ON, OFF), 1],
         ])('updateHeating %p expecting %p', (items, callCount) => {
             updateHeating(items)
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(callCount);
