@@ -1,5 +1,13 @@
 import {ItemMap} from "../classes";
-import {AIR_HEAT_SWITCH, AIR_POWER_LIMIT, BOILER_POWER_LIMIT, OFF, ON, updateHeating} from "../heating_rules";
+import {
+    AIR_HEAT_SWITCH,
+    AIR_POWER_LIMIT,
+    BOILER_POWER_LIMIT,
+    BOILER_SWITCH,
+    OFF,
+    ON,
+    updateHeating
+} from "../heating_rules";
 import {describe, expect, it} from '@jest/globals';
 
 const AIR_OK_POWER = AIR_POWER_LIMIT
@@ -18,25 +26,31 @@ describe('updateHeating tests', () => {
             [itemMap(AIR_LOW_POWER).airAuto(ON).airStatus(OFF), false],
             [itemMap(AIR_OK_POWER).airAuto(ON).airStatus(ON), false],
 
-            [itemMap(AIR_OK_POWER).airAuto(OFF).airStatus(OFF, OFF), false],
-            [itemMap(AIR_OK_POWER).airAuto(OFF).airStatus(ON, OFF), true],
-            [itemMap(AIR_LOW_POWER).airAuto(OFF).airStatus(ON, OFF), true],
-        ])('updateHeating %p expecting %p', (items, updated) => {
+            [itemMap(AIR_OK_POWER).airAuto(OFF).airStatus(OFF), false],
+            [itemMap(AIR_OK_POWER).airAuto(OFF).airStatus(ON), true],
+            [itemMap(AIR_LOW_POWER).airAuto(OFF).airStatus(ON), true],
+        ])('updateHeating for air %p updated %p', (items, updated) => {
             updateHeating(items)
 
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
         });
-        /*it.each([
-            // airHeatAuto = OFF, boilerAuto = ON
-            [createAirHeatItemMap(AIR_OK_POWER, OFF, OFF).addItems(createBoilerItemMap(OFF, ON)), 1, ON],
+        it.each([
+            [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(OFF), true, ON],
+            [itemMap(BOILER_LOW_POWER).boilerAuto(ON).boilerStatus(ON), true, OFF],
+            [itemMap(BOILER_LOW_POWER).boilerAuto(ON).boilerStatus(OFF), false, OFF],
+            [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(ON), false, ON],
 
-            // airHeatAuto = OFF, boilerAuto = OFF
-        ])('updateHeating %p expecting %p and stat %p', (items, callCount, endState) => {
+            [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(OFF), false, OFF],
+            [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
+            [itemMap(BOILER_LOW_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
+
+        ])('updateHeating for boiler %p updated %p and status %p', (items, updated, newState) => {
             updateHeating(items)
 
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(newState);
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(callCount);
-            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(endState);
-        });*/
+        });
     }
 )

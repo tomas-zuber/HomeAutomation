@@ -29,25 +29,43 @@ export const BOILER_POWER_LIMIT = -600;
 export const ON = "ON";
 export const OFF = "OFF";
 
-function switchAirHeat(items) {
+function switchAirHeat(items, status) {
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
-    airHeatSwitch.sendCommand(0);
+    airHeatSwitch.sendCommand(status);
+}
+function switchBoiler(items, status) {
+    let boilerSwitch = items.getItem(BOILER_SWITCH);
+    boilerSwitch.sendCommand(status);
 }
 
 export function updateHeating(items) {
     let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
     let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
+    let boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
+    let boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
+    let powerSum = items.getItem(POWER_SUM).rawState
 
     if (airHeatAuto === ON) {
-        let powerSum = items.getItem(POWER_SUM).rawState
         if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-            switchAirHeat(items);
+            switchAirHeat(items, ON);
         } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
-            switchAirHeat(items);
+            switchAirHeat(items, OFF);
         }
     } else {
         if (airHeatStatus === ON) {
-            switchAirHeat(items);
+            switchAirHeat(items, OFF);
+        }
+    }
+
+    if (boilerAuto === ON) {
+        if (powerSum <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
+            switchBoiler(items, ON);
+        } else if (powerSum > BOILER_POWER_LIMIT && boilerStatus === ON) {
+            switchBoiler(items, OFF);
+        }
+    } else {
+        if (boilerStatus === ON) {
+            switchBoiler(items, OFF);
         }
     }
 }
