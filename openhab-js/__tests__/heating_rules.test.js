@@ -17,10 +17,20 @@ describe("updateHeating function", () => {
         expect(items.getItem(AIR_HEAT_SWITCH).rawState).toEqual(ON);
     });
 
+    test("air heater is ON, powerSum is low -> turn OFF", () => {
+        const items = new ItemMap();
+        items.addItem(POWER_SUM, new Item(AIR_HEAT_LOW_POWER));
+        items.addItem(AIR_HEAT_SWITCH, new Item(ON));
+
+        updateHeating(items);
+
+        expect(items.getItem(AIR_HEAT_SWITCH).rawState).toEqual(OFF);
+    });
+
     test("air heater is OFF, powerSum is low -> nothing", () => {
         const items = new ItemMap();
         items.addItem(POWER_SUM, new Item(AIR_HEAT_LOW_POWER));
-        let airHeatSwitch = new Item(ON);
+        let airHeatSwitch = new Item(OFF);
         items.addItem(AIR_HEAT_SWITCH, airHeatSwitch);
         const spy = jest.spyOn(airHeatSwitch, 'sendCommand')
 

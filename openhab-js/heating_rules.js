@@ -29,5 +29,7 @@ export function updateHeating(items) {
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
     if (powerSum <= AIR_POWER_LIMIT && airHeatSwitch.rawState === OFF) {
         airHeatSwitch.sendCommand(ON)
+    } else if (powerSum > AIR_POWER_LIMIT && airHeatSwitch.rawState === ON) {
+        airHeatSwitch.sendCommand(OFF)
     }
 }
