@@ -9,6 +9,12 @@ shellyplug__1921680202_Power_Consumption (Type=NumberItem, State=0 W, Label=Swit
 shellyplug__1921680202_Power (Type=SwitchItem, State=OFF, Label=Switch1, Category=Switch, Tags=[Switch, Power])
 Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 */
+/*
+* When moving to openhab:
+* - remove `export` keyword
+* - move constants into updateHeating function
+* - call function `updateHeating(items)`
+* */
 export const POWER_SUM = "PowerSum";
 
 export const AIR_HEAT_STATUS = "Rekup_heat_status"; // ON/OFF
@@ -22,21 +28,25 @@ export const PLUG1_AUTO = "Switch1_auto"; // ON/OFF
 export const ON = "ON";
 export const OFF = "OFF";
 
+function switchAirHeat(items) {
+    let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
+    airHeatSwitch.sendCommand(0);
+}
+
 export function updateHeating(items) {
-    let powerSum = items.getItem(POWER_SUM).rawState
     let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState;
     let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState;
-    let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
 
     if (airHeatAuto === ON) {
+        let powerSum = items.getItem(POWER_SUM).rawState
         if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-            airHeatSwitch.sendCommand(0)
+            switchAirHeat(items);
         } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
-            airHeatSwitch.sendCommand(0)
+            switchAirHeat(items);
         }
     } else {
         if (airHeatStatus === ON) {
-            airHeatSwitch.sendCommand(0)
+            switchAirHeat(items);
         }
     }
 }
