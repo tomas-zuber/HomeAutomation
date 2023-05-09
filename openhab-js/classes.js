@@ -1,7 +1,28 @@
-import {POWER_SUM} from "./heating_rules";
+import {
+    AIR_HEAT_AUTO,
+    AIR_HEAT_STATUS,
+    AIR_HEAT_SWITCH,
+    BOILER_AUTO,
+    BOILER_SWITCH,
+    OFF,
+    POWER_SUM
+} from "./heating_rules";
+import {jest} from "@jest/globals";
 
 export class ItemMap {
     values = new Map();
+
+    constructor(power = 0) {
+        this.power(power)
+        let airHeatSwitch = new Item();
+        airHeatSwitch.spy = jest.spyOn(airHeatSwitch, 'sendCommand')
+        this.addItem(AIR_HEAT_SWITCH, airHeatSwitch);
+
+        this.airStatus(OFF);
+        this.airAuto(OFF);
+        this.boilerStatus(OFF)
+        this.boilerAuto(OFF)
+    }
 
     addItem(name, value) {
         this.values.set(name, value);
@@ -12,9 +33,33 @@ export class ItemMap {
     }
 
     power(value) {
-        this.addItem(POWER_SUM, new Item(value))
+        this.addItem(POWER_SUM, new Item(value));
+        return this;
+    }
+
+    airStatus(value) {
+        this.addItem(AIR_HEAT_STATUS, new Item(value));
+        return this;
+    }
+
+    airAuto(value) {
+        this.addItem(AIR_HEAT_AUTO, new Item(value));
+        return this;
+    }
+
+    boilerStatus(value) {
+        let boilerSwitch = new Item(value);
+        boilerSwitch.spy = jest.spyOn(boilerSwitch, 'sendCommand')
+        this.addItem(BOILER_SWITCH, boilerSwitch);
+        return this;
+    }
+
+    boilerAuto(value) {
+        this.addItem(BOILER_AUTO, new Item(value));
+        return this;
     }
 }
+
 export class Item {
     rawState;
     spy; // used for testing
