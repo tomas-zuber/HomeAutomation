@@ -55,11 +55,47 @@ describe('updateHeating tests', () => {
         });
 
         it.each([
-            [itemMap(AIR_OK_POWER + BOILER_OK_POWER - 1)
+            // enough power for both
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(OFF),
+                true, true, ON],
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER)
+                .airAuto(ON).airStatus(ON)
+                .boilerAuto(ON).boilerStatus(OFF),
+                false, true, ON],
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(ON),
+                true, false, ON],
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER)
+                .airAuto(ON).airStatus(ON)
+                .boilerAuto(ON).boilerStatus(ON),
+                false, false, ON],
+
+            // enough power for only 1
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER + 1)
                 .airAuto(ON).airStatus(OFF)
                 .boilerAuto(ON).boilerStatus(OFF),
                 true, false, OFF],
-            // TODO continue here
+
+            // low power
+            [itemMap(0)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(OFF),
+                false, false, OFF],
+            [itemMap(0)
+                .airAuto(ON).airStatus(ON)
+                .boilerAuto(ON).boilerStatus(OFF),
+                true, false, OFF],
+            [itemMap(0)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(ON),
+                false, true, OFF],
+            [itemMap(0)
+                .airAuto(ON).airStatus(ON)
+                .boilerAuto(ON).boilerStatus(ON),
+                true, true, OFF],
 
         ])('updateHeating for air & boiler %p', (items, airUpdated, boilerUpdated, boilerNewState) => {
             updateHeating(items)
