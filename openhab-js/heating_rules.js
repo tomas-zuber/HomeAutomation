@@ -41,42 +41,42 @@ function switchBoiler(items, status) {
     return BOILER_POWER_LIMIT * (status === ON ? -1 : 1)
 }
 
-function handleAir(airHeatAuto, powerSum, airHeatStatus, items) {
+function updateAir(items, power) {
+    const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
+    const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
     if (airHeatAuto === ON) {
-        if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-            powerSum += switchAirHeat(items, ON);
-        } else if (powerSum > POWER_MAX_CONSUMPTION && airHeatStatus === ON) {
-            powerSum += switchAirHeat(items, OFF);
+        if (power <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
+            return switchAirHeat(items, ON);
+        } else if (power > POWER_MAX_CONSUMPTION && airHeatStatus === ON) {
+            return switchAirHeat(items, OFF);
         }
     } else {
         if (airHeatStatus === ON) {
-            powerSum += switchAirHeat(items, OFF);
+            return switchAirHeat(items, OFF);
         }
     }
-    return powerSum;
+    return 0;
 }
 
-function handleBoiler(boilerAuto, powerSum, boilerStatus, items) {
+function updateBoiler(items, power) {
+    const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
+    const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
     if (boilerAuto === ON) {
-        if (powerSum <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
-            switchBoiler(items, ON);
-        } else if (powerSum > POWER_MAX_CONSUMPTION && boilerStatus === ON) {
-            switchBoiler(items, OFF);
+        if (power <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
+            return switchBoiler(items, ON);
+        } else if (power > POWER_MAX_CONSUMPTION && boilerStatus === ON) {
+            return switchBoiler(items, OFF);
         }
     } else {
         if (boilerStatus === ON) {
-            switchBoiler(items, OFF);
+            return switchBoiler(items, OFF);
         }
     }
+    return 0;
 }
 
 export function updateHeating(items) {
-    const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
-    const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
-    const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
-    const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
     let powerSum = items.getItem(POWER_SUM).rawState
-
-    powerSum = handleAir(airHeatAuto, powerSum, airHeatStatus, items);
-    handleBoiler(boilerAuto, powerSum, boilerStatus, items);
+    powerSum += updateAir(items, powerSum);
+    updateBoiler(items, powerSum);
 }
