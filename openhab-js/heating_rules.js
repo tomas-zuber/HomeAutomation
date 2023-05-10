@@ -32,10 +32,12 @@ export const OFF = "OFF";
 function switchAirHeat(items, status) {
     let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
     airHeatSwitch.sendCommand(status);
+    return AIR_POWER_LIMIT * (status === ON ? -1 : 1)
 }
 function switchBoiler(items, status) {
     let boilerSwitch = items.getItem(BOILER_SWITCH);
     boilerSwitch.sendCommand(status);
+    return BOILER_POWER_LIMIT * (status === ON ? -1 : 1)
 }
 
 export function updateHeating(items) {
@@ -47,16 +49,13 @@ export function updateHeating(items) {
 
     if (airHeatAuto === ON) {
         if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-            switchAirHeat(items, ON);
-            powerSum -= AIR_POWER_LIMIT;
+            powerSum += switchAirHeat(items, ON);
         } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
-            switchAirHeat(items, OFF);
-            powerSum += AIR_POWER_LIMIT;
+            powerSum += switchAirHeat(items, OFF);
         }
     } else {
         if (airHeatStatus === ON) {
-            switchAirHeat(items, OFF);
-            powerSum += AIR_POWER_LIMIT;
+            powerSum += switchAirHeat(items, OFF);
         }
     }
 

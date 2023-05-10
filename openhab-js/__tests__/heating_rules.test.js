@@ -78,6 +78,14 @@ describe('updateHeating tests', () => {
                 .airAuto(ON).airStatus(OFF)
                 .boilerAuto(ON).boilerStatus(OFF),
                 true, false, OFF],
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER + 1)
+                .airAuto(ON).airStatus(OFF)
+                .boilerAuto(ON).boilerStatus(ON),
+                true, true, OFF],
+            [itemMap(AIR_OK_POWER + BOILER_OK_POWER + 1)
+                .airAuto(ON).airStatus(ON)
+                .boilerAuto(ON).boilerStatus(OFF),
+                false, true, ON],
 
             // low power
             [itemMap(0)
