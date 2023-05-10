@@ -12,8 +12,8 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 /*
 * When moving to openhab:
 * - remove `export` keyword
-* - move constants into updateHeating function
-* - call function `updateHeating(items)`
+* - move all code into a wrapping function doUpdate{}
+* - call function `doUpdate(items)`
 * */
 export const POWER_SUM = "PowerSum";
 export const POWER_MAX_CONSUMPTION = 0;

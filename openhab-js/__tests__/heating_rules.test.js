@@ -73,7 +73,7 @@ describe('updateHeating tests', () => {
             // air OFF & boiler OFF
             [autoOn(AIR_LOW_POWER).airStatus(OFF).boilerStatus(OFF),
                 false, false, OFF],
-            [autoOn(AIR_OK_POWER).airStatus(OFF).boilerStatus(OFF),
+            [autoOn(AIR_OK_POWER + BOILER_OK_POWER + CONSUMING_POWER).airStatus(OFF).boilerStatus(OFF),
                 true, false, OFF],
             [autoOn(AIR_OK_POWER + BOILER_OK_POWER).airStatus(OFF).boilerStatus(OFF),
                 true, true, ON],
@@ -83,14 +83,26 @@ describe('updateHeating tests', () => {
                 false, false, ON],
             [autoOn(CONSUMING_POWER).airStatus(ON).boilerStatus(ON),
                 false, true, OFF],
+            [autoOn(CONSUMING_POWER - BOILER_OK_POWER).airStatus(ON).boilerStatus(ON),
+                true, true, OFF],
 
             // air ON & boiler OFF
+            [autoOn(BOILER_LOW_POWER).airStatus(ON).boilerStatus(OFF),
+                false, false, OFF],
             [autoOn(BOILER_OK_POWER).airStatus(ON).boilerStatus(OFF),
                 false, true, ON],
+            [autoOn(CONSUMING_POWER).airStatus(ON).boilerStatus(OFF),
+                true, false, OFF],
 
             // air OFF & boiler ON
+            [autoOn(AIR_LOW_POWER).airStatus(OFF).boilerStatus(ON),
+                false, false, ON], // wrong, but can happen only if airAuto is turned OFF and ON
             [autoOn(AIR_OK_POWER).airStatus(OFF).boilerStatus(ON),
                 true, false, ON],
+            [autoOn(CONSUMING_POWER - BOILER_OK_POWER).airStatus(OFF).boilerStatus(ON),
+                false, true, OFF],
+            [autoOn(CONSUMING_POWER).airStatus(OFF).boilerStatus(ON),
+                true, true, OFF],
         ])('updateHeating for air & boiler %p', (items, airUpdated, boilerUpdated, boilerNewState) => {
             updateHeating(items)
 
