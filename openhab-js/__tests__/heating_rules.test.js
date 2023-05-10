@@ -71,23 +71,25 @@ describe('updateHeating tests', () => {
 
         it.each([
             // air OFF & boiler OFF
-            [autoOn(AIR_OK_POWER + BOILER_OK_POWER)
-                .airStatus(OFF).boilerStatus(OFF),
+            [autoOn(AIR_LOW_POWER).airStatus(OFF).boilerStatus(OFF),
+                false, false, OFF],
+            [autoOn(AIR_OK_POWER).airStatus(OFF).boilerStatus(OFF),
+                true, false, OFF],
+            [autoOn(AIR_OK_POWER + BOILER_OK_POWER).airStatus(OFF).boilerStatus(OFF),
                 true, true, ON],
 
             // air ON & boiler ON
-            [autoOn(AIR_OK_POWER + BOILER_OK_POWER)
-                .airStatus(ON).boilerStatus(ON),
+            [autoOn(AIR_LOW_POWER).airStatus(ON).boilerStatus(ON),
                 false, false, ON],
+            [autoOn(CONSUMING_POWER).airStatus(ON).boilerStatus(ON),
+                true, false, ON], // TODO fix
 
             // air ON & boiler OFF
-            [autoOn(AIR_OK_POWER + BOILER_OK_POWER)
-                .airStatus(ON).boilerStatus(OFF),
+            [autoOn(BOILER_OK_POWER).airStatus(ON).boilerStatus(OFF),
                 false, true, ON],
 
             // air OFF & boiler ON
-            [autoOn(AIR_OK_POWER + BOILER_OK_POWER)
-                .airStatus(OFF).boilerStatus(ON),
+            [autoOn(AIR_OK_POWER).airStatus(OFF).boilerStatus(ON),
                 true, false, ON],
         ])('updateHeating for air & boiler %p', (items, airUpdated, boilerUpdated, boilerNewState) => {
             updateHeating(items)
