@@ -16,6 +16,7 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 * - call function `updateHeating(items)`
 * */
 export const POWER_SUM = "PowerSum";
+export const POWER_MAX_CONSUMPTION = 0;
 
 export const AIR_HEAT_STATUS = "Rekup_heat_status"; // ON/OFF
 export const AIR_HEAT_AUTO = "Rekup_heat_auto"; // ON/OFF
@@ -41,16 +42,16 @@ function switchBoiler(items, status) {
 }
 
 export function updateHeating(items) {
-    let airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
-    let airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
-    let boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
-    let boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
-    var powerSum = items.getItem(POWER_SUM).rawState
+    const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
+    const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
+    const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
+    const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
+    let powerSum = items.getItem(POWER_SUM).rawState
 
     if (airHeatAuto === ON) {
         if (powerSum <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
             powerSum += switchAirHeat(items, ON);
-        } else if (powerSum > AIR_POWER_LIMIT && airHeatStatus === ON) {
+        } else if (powerSum > POWER_MAX_CONSUMPTION && airHeatStatus === ON) {
             powerSum += switchAirHeat(items, OFF);
         }
     } else {
@@ -62,7 +63,7 @@ export function updateHeating(items) {
     if (boilerAuto === ON) {
         if (powerSum <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
             switchBoiler(items, ON);
-        } else if (powerSum > BOILER_POWER_LIMIT && boilerStatus === ON) {
+        } else if (powerSum > POWER_MAX_CONSUMPTION && boilerStatus === ON) {
             switchBoiler(items, OFF);
         }
     } else {
