@@ -35,6 +35,7 @@ function switchAirHeat(items, status) {
     airHeatSwitch.sendCommand(status);
     return AIR_POWER_LIMIT * (status === ON ? -1 : 1)
 }
+
 function switchBoiler(items, status) {
     let boilerSwitch = items.getItem(BOILER_SWITCH);
     boilerSwitch.sendCommand(status);
@@ -77,6 +78,11 @@ function updateBoiler(items, power) {
 
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
-    powerSum += updateAir(items, powerSum);
-    updateBoiler(items, powerSum);
+    if (powerSum > POWER_MAX_CONSUMPTION) {
+        powerSum += updateBoiler(items, powerSum);
+        updateAir(items, powerSum);
+    } else {
+        powerSum += updateAir(items, powerSum);
+        updateBoiler(items, powerSum);
+    }
 }

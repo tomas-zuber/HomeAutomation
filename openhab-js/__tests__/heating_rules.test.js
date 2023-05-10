@@ -82,7 +82,7 @@ describe('updateHeating tests', () => {
             [autoOn(AIR_LOW_POWER).airStatus(ON).boilerStatus(ON),
                 false, false, ON],
             [autoOn(CONSUMING_POWER).airStatus(ON).boilerStatus(ON),
-                true, false, ON], // TODO fix
+                false, true, OFF],
 
             // air ON & boiler OFF
             [autoOn(BOILER_OK_POWER).airStatus(ON).boilerStatus(OFF),
