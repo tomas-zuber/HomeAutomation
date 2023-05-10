@@ -12,8 +12,8 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 /*
 * When moving to openhab:
 * - remove `export` keyword
-* - move all code into a wrapping function doUpdate{}
-* - call function `doUpdate(items)`
+* - move all code into a wrapping function doUpdate{ ... code ... updateHeating(items);}
+* - call function `doUpdate(items);`
 * */
 export const POWER_SUM = "PowerSum";
 export const POWER_MAX_CONSUMPTION = 0;
@@ -45,6 +45,7 @@ function switchBoiler(items, status) {
 function updateAir(items, power) {
     const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
     const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
+    console.log("air %s %s %s", airHeatStatus, airHeatAuto, power)
     if (airHeatAuto === ON) {
         if (power <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
             return switchAirHeat(items, ON);
@@ -62,6 +63,7 @@ function updateAir(items, power) {
 function updateBoiler(items, power) {
     const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
     const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
+    console.log("boiler %s %s %s", boilerStatus, boilerAuto, power)
     if (boilerAuto === ON) {
         if (power <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
             return switchBoiler(items, ON);
