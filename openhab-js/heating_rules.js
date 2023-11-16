@@ -27,6 +27,10 @@ export const HEATER_AUTO = "Switch1_auto"; // ON/OFF
 export const HEATER_SWITCH = "shellyplug__1921680202_Power"; // ON/OFF
 export const HEATER_POWER_LIMIT = -600;
 
+export const BOILER_AUTO = "Switch2_auto"; // ON/OFF
+export const BOILER_SWITCH = "shellyplugs2__1921680204_Power"; // ON/OFF
+export const BOILER_POWER_LIMIT = -800;
+
 export const ON = "ON";
 export const OFF = "OFF";
 

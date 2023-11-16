@@ -4,6 +4,8 @@ import {
     AIR_HEAT_SWITCH,
     HEATER_AUTO,
     HEATER_SWITCH,
+    BOILER_AUTO,
+    BOILER_SWITCH,
     OFF,
     POWER_SUM
 } from "./heating_rules";
@@ -22,6 +24,8 @@ export class ItemMap {
         this.airAuto(OFF);
         this.heaterStatus(OFF)
         this.heaterAuto(OFF)
+        this.boilerStatus(OFF)
+        this.boilerAuto(OFF)
     }
 
     addItem(name, value) {
@@ -56,6 +60,18 @@ export class ItemMap {
 
     heaterAuto(value) {
         this.addItem(HEATER_AUTO, new Item(value));
+        return this;
+    }
+
+    boilerStatus(value) {
+        let boilerSwitch = new Item(value);
+        boilerSwitch.spy = jest.spyOn(boilerSwitch, 'sendCommand')
+        this.addItem(BOILER_SWITCH, boilerSwitch);
+        return this;
+    }
+
+    boilerAuto(value) {
+        this.addItem(BOILER_AUTO, new Item(value));
         return this;
     }
 }

@@ -1,9 +1,11 @@
 import {ItemMap} from "../classes";
 import {
     AIR_HEAT_SWITCH,
+    HEATER_SWITCH,
+    BOILER_SWITCH,
     AIR_POWER_LIMIT,
     HEATER_POWER_LIMIT,
-    HEATER_SWITCH,
+    BOILER_POWER_LIMIT,
     OFF,
     ON,
     POWER_MAX_CONSUMPTION,
@@ -13,8 +15,13 @@ import {describe, expect, it} from '@jest/globals';
 
 const AIR_OK_POWER = AIR_POWER_LIMIT
 const AIR_LOW_POWER = AIR_POWER_LIMIT + 1
+
 const HEATER_OK_POWER = HEATER_POWER_LIMIT
 const HEATER_LOW_POWER = HEATER_POWER_LIMIT + 1
+
+const BOILER_OK_POWER = BOILER_POWER_LIMIT
+const BOILER_LOW_POWER = BOILER_POWER_LIMIT + 1
+
 const CONSUMING_POWER = POWER_MAX_CONSUMPTION + 1
 
 function itemMap(powerSum) {
@@ -22,7 +29,7 @@ function itemMap(powerSum) {
 }
 
 function autoOn(power) {
-    return itemMap(power).airAuto(ON).heaterAuto(ON);
+    return itemMap(power).airAuto(ON).heaterAuto(ON).boilerAuto(ON);
 }
 
 describe('updateHeating tests', () => {
@@ -45,6 +52,7 @@ describe('updateHeating tests', () => {
 
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
         });
 
         it.each([
@@ -67,6 +75,7 @@ describe('updateHeating tests', () => {
             expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).rawState).toEqual(newState);
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
         });
 
         it.each([
@@ -109,6 +118,7 @@ describe('updateHeating tests', () => {
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(airUpdated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(heaterUpdated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).rawState).toEqual(heaterNewState);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
         });
     }
 )
