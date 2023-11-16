@@ -102,46 +102,58 @@ describe('updateHeating tests', () => {
         });
 
         it.each([
-            // air OFF & heater OFF
-            [autoOn(AIR_LOW_POWER).airStatus(OFF).heaterStatus(OFF),
-                false, false, OFF],
-            [autoOn(AIR_OK_POWER + HEATER_OK_POWER + CONSUMING_POWER).airStatus(OFF).heaterStatus(OFF),
-                true, false, OFF],
-            [autoOn(AIR_OK_POWER + HEATER_OK_POWER).airStatus(OFF).heaterStatus(OFF),
-                true, true, ON],
+            // air OFF & heater OFF & boiler OFF
+            [autoOn(AIR_LOW_POWER)
+                .airStatus(OFF).heaterStatus(OFF).boilerStatus(OFF),
+                false, false, OFF, false, OFF],
+            [autoOn(AIR_OK_POWER + HEATER_OK_POWER + CONSUMING_POWER)
+                .airStatus(OFF).heaterStatus(OFF).boilerStatus(OFF),
+                true, false, OFF, false, OFF],
+            [autoOn(AIR_OK_POWER + HEATER_OK_POWER + BOILER_OK_POWER + CONSUMING_POWER)
+                .airStatus(OFF).heaterStatus(OFF).boilerStatus(OFF),
+                true, true, ON, false, OFF],
+            [autoOn(AIR_OK_POWER + HEATER_OK_POWER + BOILER_OK_POWER)
+                .airStatus(OFF).heaterStatus(OFF),
+                true, true, ON, true, ON],
 
-            // air ON & heater ON
-            [autoOn(AIR_LOW_POWER).airStatus(ON).heaterStatus(ON),
-                false, false, ON],
-            [autoOn(CONSUMING_POWER).airStatus(ON).heaterStatus(ON),
-                false, true, OFF],
-            [autoOn(CONSUMING_POWER - HEATER_OK_POWER).airStatus(ON).heaterStatus(ON),
-                true, true, OFF],
+            // air ON & heater ON & boiler ON
+            [autoOn(AIR_LOW_POWER).airStatus(ON).heaterStatus(ON).boilerStatus(ON),
+                false, false, ON, false, ON],
+            [autoOn(CONSUMING_POWER).airStatus(ON).heaterStatus(ON).boilerStatus(ON),
+                false, false, ON, true, OFF],
+            [autoOn(CONSUMING_POWER - BOILER_OK_POWER).airStatus(ON).heaterStatus(ON).boilerStatus(ON),
+                false, true, OFF, true, OFF],
+            [autoOn(CONSUMING_POWER - BOILER_OK_POWER - HEATER_OK_POWER).airStatus(ON).heaterStatus(ON).boilerStatus(ON),
+                true, true, OFF, true, OFF],
 
-            // air ON & heater OFF
-            [autoOn(HEATER_LOW_POWER).airStatus(ON).heaterStatus(OFF),
-                false, false, OFF],
-            [autoOn(HEATER_OK_POWER).airStatus(ON).heaterStatus(OFF),
-                false, true, ON],
-            [autoOn(CONSUMING_POWER).airStatus(ON).heaterStatus(OFF),
-                true, false, OFF],
+            // air ON & heater OFF & boiler OFF
+            [autoOn(HEATER_LOW_POWER).airStatus(ON).heaterStatus(OFF).boilerStatus(OFF),
+                false, false, OFF, false, OFF],
+            [autoOn(HEATER_OK_POWER).airStatus(ON).heaterStatus(OFF).boilerStatus(OFF),
+                false, true, ON, false, OFF],
+            [autoOn(CONSUMING_POWER).airStatus(ON).heaterStatus(OFF).boilerStatus(OFF),
+                true, false, OFF, false, OFF],
 
-            // air OFF & heater ON
-            [autoOn(AIR_LOW_POWER).airStatus(OFF).heaterStatus(ON),
-                false, false, ON], // wrong, but can happen only if airAuto is turned OFF and ON
-            [autoOn(AIR_OK_POWER).airStatus(OFF).heaterStatus(ON),
-                true, false, ON],
-            [autoOn(CONSUMING_POWER - HEATER_OK_POWER).airStatus(OFF).heaterStatus(ON),
-                false, true, OFF],
-            [autoOn(CONSUMING_POWER).airStatus(OFF).heaterStatus(ON),
-                true, true, OFF],
-        ])('updateHeating for air & heater %p', (items, airUpdated, heaterUpdated, heaterNewState) => {
+            // air OFF & heater ON & boiler OFF
+            [autoOn(AIR_LOW_POWER).airStatus(OFF).heaterStatus(ON).boilerStatus(OFF),
+                false, false, ON, false, OFF], // wrong, but can happen only if airAuto is turned OFF and ON
+            [autoOn(AIR_OK_POWER).airStatus(OFF).heaterStatus(ON).boilerStatus(OFF),
+                true, false, ON, false, OFF],
+            [autoOn(CONSUMING_POWER - HEATER_OK_POWER).airStatus(OFF).heaterStatus(ON).boilerStatus(OFF),
+                false, true, OFF, false, OFF],
+            [autoOn(CONSUMING_POWER).airStatus(OFF).heaterStatus(ON).boilerStatus(OFF),
+                true, true, OFF, false, OFF],
+
+            // TODO air OFF & heater ON & boiler OFF
+
+        ])('updateHeating for air & heater & boiler %p', (items, airUpdated, heaterUpdated, heaterNewState, boilerUpdated, boilerNewState) => {
             updateHeating(items)
 
             expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(airUpdated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(heaterUpdated ? 1 : 0);
             expect(items.getItem(HEATER_SWITCH).rawState).toEqual(heaterNewState);
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(boilerUpdated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(boilerNewState);
         });
     }
 )
