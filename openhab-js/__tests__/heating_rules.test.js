@@ -79,6 +79,29 @@ describe('updateHeating tests', () => {
         });
 
         it.each([
+            // OFF
+            [itemMap(BOILER_LOW_POWER).boilerAuto(ON).boilerStatus(OFF), false, OFF],
+            [itemMap(CONSUMING_POWER).boilerAuto(ON).boilerStatus(OFF), false, OFF],
+            [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(OFF), true, ON],
+
+            // ON
+            [itemMap(BOILER_LOW_POWER).boilerAuto(ON).boilerStatus(ON), false, ON],
+            [itemMap(CONSUMING_POWER).boilerAuto(ON).boilerStatus(ON), true, OFF],
+
+            // auto OFF
+            [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(OFF), false, OFF],
+            [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
+            [itemMap(CONSUMING_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
+        ])('updateHeating for boiler %p updated %p and status %p', (items, updated, newState) => {
+            updateHeating(items)
+
+            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(newState);
+            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(0);
+        });
+
+        it.each([
             // air OFF & heater OFF
             [autoOn(AIR_LOW_POWER).airStatus(OFF).heaterStatus(OFF),
                 false, false, OFF],

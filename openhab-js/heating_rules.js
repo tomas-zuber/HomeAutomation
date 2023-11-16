@@ -46,6 +46,12 @@ function switchHeater(items, status) {
     return HEATER_POWER_LIMIT * (status === ON ? -1 : 1)
 }
 
+function switchBoiler(items, status) {
+    let boilerSwitch = items.getItem(BOILER_SWITCH);
+    boilerSwitch.sendCommand(status);
+    return BOILER_POWER_LIMIT * (status === ON ? -1 : 1)
+}
+
 function updateAir(items, power) {
     const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
     const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
@@ -82,13 +88,33 @@ function updateHeater(items, power) {
     return 0;
 }
 
+function updateBoiler(items, power) {
+    const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
+    const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
+    console.log("boiler %s %s %s", boilerStatus, boilerAuto, power)
+    if (boilerAuto === ON) {
+        if (power <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
+            return switchBoiler(items, ON);
+        } else if (power > POWER_MAX_CONSUMPTION && boilerStatus === ON) {
+            return switchBoiler(items, OFF);
+        }
+    } else {
+        if (boilerStatus === ON) {
+            return switchBoiler(items, OFF);
+        }
+    }
+    return 0;
+}
+
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
-    if (powerSum > POWER_MAX_CONSUMPTION) {
+    if (powerSum > POWER_MAX_CONSUMPTION) { // reverse order of turning off
+        powerSum += updateBoiler(items, powerSum);
         powerSum += updateHeater(items, powerSum);
         updateAir(items, powerSum);
     } else {
         powerSum += updateAir(items, powerSum);
-        updateHeater(items, powerSum);
+        powerSum += updateHeater(items, powerSum);
+        updateBoiler(items, powerSum);
     }
 }
