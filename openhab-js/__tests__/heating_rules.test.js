@@ -144,7 +144,15 @@ describe('updateHeating tests', () => {
             [autoOn(CONSUMING_POWER).airStatus(OFF).heaterStatus(ON).boilerStatus(OFF),
                 true, true, OFF, false, OFF],
 
-            // TODO air OFF & heater ON & boiler OFF
+            // air OFF & heater OFF & boiler ON
+            [autoOn(AIR_LOW_POWER).airStatus(OFF).heaterStatus(OFF).boilerStatus(ON),
+                false, false, OFF, false, ON], // wrong, but can happen only if airAuto and heaterAuto is turned OFF and ON
+            [autoOn(AIR_OK_POWER).airStatus(OFF).heaterStatus(OFF).boilerStatus(ON),
+                true, false, OFF, false, ON],
+            [autoOn(CONSUMING_POWER - BOILER_OK_POWER).airStatus(OFF).heaterStatus(OFF).boilerStatus(ON),
+                false, false, OFF, true, OFF],
+            [autoOn(CONSUMING_POWER).airStatus(OFF).heaterStatus(OFF).boilerStatus(ON),
+                false, true, ON, true, OFF], // TODO? wrong
 
         ])('updateHeating for air & heater & boiler %p', (items, airUpdated, heaterUpdated, heaterNewState, boilerUpdated, boilerNewState) => {
             updateHeating(items)
