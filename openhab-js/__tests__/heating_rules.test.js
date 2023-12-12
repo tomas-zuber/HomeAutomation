@@ -1,12 +1,8 @@
 import {ItemMap} from "../classes";
 import {
-    AIR_HEAT_SWITCH,
-    HEATER_SWITCH,
-    BOILER_SWITCH,
-    AIR_POWER_LIMIT,
-    HEATER_POWER_LIMIT,
-    BOILER_POWER_LIMIT,
-    BOILER_DAILY_USAGE_MAX,
+    radiator,
+    boiler,
+    ventilation,
     OFF,
     ON,
     POWER_MAX_CONSUMPTION,
@@ -14,15 +10,15 @@ import {
 } from "../heating_rules";
 import {describe, expect, it} from '@jest/globals';
 
-const AIR_OK_POWER = AIR_POWER_LIMIT
-const AIR_LOW_POWER = AIR_POWER_LIMIT + 1
+const AIR_OK_POWER = ventilation.consumption
+const AIR_LOW_POWER = ventilation.consumption + 1
 
-const HEATER_OK_POWER = HEATER_POWER_LIMIT
-const HEATER_LOW_POWER = HEATER_POWER_LIMIT + 1
+const HEATER_OK_POWER = radiator.consumption
+const HEATER_LOW_POWER = radiator.consumption + 1
 
-const BOILER_OK_POWER = BOILER_POWER_LIMIT
-const BOILER_LOW_POWER = BOILER_POWER_LIMIT + 1
-const BOILER_DAILY_REACHED = BOILER_DAILY_USAGE_MAX + 1
+const BOILER_OK_POWER = boiler.consumption
+const BOILER_LOW_POWER = boiler.consumption + 1
+const BOILER_DAILY_REACHED = boiler.dailyLimit + 1
 
 const CONSUMING_POWER = POWER_MAX_CONSUMPTION + 1
 
@@ -52,9 +48,9 @@ describe('updateHeating tests', () => {
         ])('updateHeating for air %p updated %p', (items, updated) => {
             updateHeating(items)
 
-            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
-            expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(0);
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(ventilation.switchItem).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(radiator.switchItem).spy).toBeCalledTimes(0);
+            expect(items.getItem(boiler.switchItem).spy).toBeCalledTimes(0);
         });
 
         it.each([
@@ -74,10 +70,10 @@ describe('updateHeating tests', () => {
         ])('updateHeating for heater %p updated %p and status %p', (items, updated, newState) => {
             updateHeating(items)
 
-            expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
-            expect(items.getItem(HEATER_SWITCH).rawState).toEqual(newState);
-            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(radiator.switchItem).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(radiator.switchItem).rawState).toEqual(newState);
+            expect(items.getItem(ventilation.switchItem).spy).toBeCalledTimes(0);
+            expect(items.getItem(boiler.switchItem).spy).toBeCalledTimes(0);
         });
 
         it.each([
@@ -101,10 +97,10 @@ describe('updateHeating tests', () => {
         ])('updateHeating for boiler %p updated %p and status %p', (items, updated, newState) => {
             updateHeating(items)
 
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(updated ? 1 : 0);
-            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(newState);
-            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(0);
-            expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(0);
+            expect(items.getItem(boiler.switchItem).spy).toBeCalledTimes(updated ? 1 : 0);
+            expect(items.getItem(boiler.switchItem).rawState).toEqual(newState);
+            expect(items.getItem(ventilation.switchItem).spy).toBeCalledTimes(0);
+            expect(items.getItem(radiator.switchItem).spy).toBeCalledTimes(0);
         });
 
         it.each([
@@ -163,11 +159,11 @@ describe('updateHeating tests', () => {
         ])('updateHeating for air & heater & boiler %p', (items, airUpdated, heaterUpdated, heaterNewState, boilerUpdated, boilerNewState) => {
             updateHeating(items)
 
-            expect(items.getItem(AIR_HEAT_SWITCH).spy).toBeCalledTimes(airUpdated ? 1 : 0);
-            expect(items.getItem(HEATER_SWITCH).spy).toBeCalledTimes(heaterUpdated ? 1 : 0);
-            expect(items.getItem(HEATER_SWITCH).rawState).toEqual(heaterNewState);
-            expect(items.getItem(BOILER_SWITCH).spy).toBeCalledTimes(boilerUpdated ? 1 : 0);
-            expect(items.getItem(BOILER_SWITCH).rawState).toEqual(boilerNewState);
+            expect(items.getItem(ventilation.switchItem).spy).toBeCalledTimes(airUpdated ? 1 : 0);
+            expect(items.getItem(radiator.switchItem).spy).toBeCalledTimes(heaterUpdated ? 1 : 0);
+            expect(items.getItem(radiator.switchItem).rawState).toEqual(heaterNewState);
+            expect(items.getItem(boiler.switchItem).spy).toBeCalledTimes(boilerUpdated ? 1 : 0);
+            expect(items.getItem(boiler.switchItem).rawState).toEqual(boilerNewState);
         });
     }
 )

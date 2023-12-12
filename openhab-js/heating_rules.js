@@ -19,12 +19,12 @@ export const POWER_SUM = "PowerSum";
 export const POWER_MAX_CONSUMPTION = 0;
 
 class Heating {
-    constructor(name, switchItem, statusItem, autoItem, limit, dailyItem = null, dailyLimit = null) {
+    constructor(name, switchItem, statusItem, autoItem, consumption, dailyItem = null, dailyLimit = null) {
         this.name = name
         this.switchItem = switchItem
         this.statusItem = statusItem // ON/OFF
         this.autoItem = autoItem // ON/OFF
-        this.limit = limit // watt
+        this.consumption = consumption // watt
         this.dailyItem = dailyItem
         this.dailyLimit = dailyLimit // minutes
     }
@@ -32,7 +32,7 @@ class Heating {
     change(items, status) {
         let heatSwitch = items.getItem(this.switchItem);
         heatSwitch.sendCommand(status);
-        return this.limit * (status === ON ? -1 : 1)
+        return this.consumption * (status === ON ? -1 : 1)
     }
 
     update(items, power) {
@@ -47,7 +47,7 @@ class Heating {
                 return 0
             }
 
-            if (power <= this.limit && status === OFF) {
+            if (power <= this.consumption && status === OFF) {
                 return this.change(items, ON);
             } else if (power > POWER_MAX_CONSUMPTION && status === ON) {
                 return this.change(items, OFF);
@@ -83,21 +83,6 @@ export const boiler = new Heating(
     -800,
     "Plug2_daily_powerOn",
     180)
-
-export const AIR_HEAT_STATUS = "Rekup_heat_status"; // ON/OFF
-export const AIR_HEAT_AUTO = "Rekup_heat_auto"; // ON/OFF
-export const AIR_HEAT_SWITCH = "Rekup_heat_switch"; // toggle
-export const AIR_POWER_LIMIT = -500;
-
-export const HEATER_AUTO = "Switch1_auto"; // ON/OFF
-export const HEATER_SWITCH = "shellyplug__1921680202_Power"; // ON/OFF
-export const HEATER_POWER_LIMIT = -600;
-
-export const BOILER_AUTO = "Switch2_auto"; // ON/OFF
-export const BOILER_SWITCH = "shellyplugs2__1921680204_Power"; // ON/OFF
-export const BOILER_POWER_LIMIT = -800;
-export const BOILER_DAILY_USAGE = "Plug2_daily_powerOn"; // minutes
-export const BOILER_DAILY_USAGE_MAX = 180; // minutes
 
 export const ON = "ON";
 export const OFF = "OFF";

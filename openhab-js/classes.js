@@ -1,12 +1,7 @@
 import {
-    AIR_HEAT_AUTO,
-    AIR_HEAT_STATUS,
-    AIR_HEAT_SWITCH,
-    HEATER_AUTO,
-    HEATER_SWITCH,
-    BOILER_AUTO,
-    BOILER_SWITCH,
-    BOILER_DAILY_USAGE,
+    radiator,
+    boiler,
+    ventilation,
     OFF,
     POWER_SUM
 } from "./heating_rules";
@@ -19,7 +14,7 @@ export class ItemMap {
         this.power(power)
         let airHeatSwitch = new Item();
         airHeatSwitch.spy = jest.spyOn(airHeatSwitch, 'sendCommand')
-        this.addItem(AIR_HEAT_SWITCH, airHeatSwitch);
+        this.addItem(ventilation.switchItem, airHeatSwitch);
 
         this.airStatus(OFF);
         this.airAuto(OFF);
@@ -44,41 +39,41 @@ export class ItemMap {
     }
 
     airStatus(value) {
-        this.addItem(AIR_HEAT_STATUS, new Item(value));
+        this.addItem(ventilation.statusItem, new Item(value));
         return this;
     }
 
     airAuto(value) {
-        this.addItem(AIR_HEAT_AUTO, new Item(value));
+        this.addItem(ventilation.autoItem, new Item(value));
         return this;
     }
 
     heaterStatus(value) {
         let heaterSwitch = new Item(value);
         heaterSwitch.spy = jest.spyOn(heaterSwitch, 'sendCommand')
-        this.addItem(HEATER_SWITCH, heaterSwitch);
+        this.addItem(radiator.switchItem, heaterSwitch);
         return this;
     }
 
     heaterAuto(value) {
-        this.addItem(HEATER_AUTO, new Item(value));
+        this.addItem(radiator.autoItem, new Item(value));
         return this;
     }
 
     boilerStatus(value) {
         let boilerSwitch = new Item(value);
         boilerSwitch.spy = jest.spyOn(boilerSwitch, 'sendCommand')
-        this.addItem(BOILER_SWITCH, boilerSwitch);
+        this.addItem(boiler.switchItem, boilerSwitch);
         return this;
     }
 
     boilerAuto(value) {
-        this.addItem(BOILER_AUTO, new Item(value));
+        this.addItem(boiler.autoItem, new Item(value));
         return this;
     }
 
     boilerDailyUsage(value) {
-        this.addItem(BOILER_DAILY_USAGE, new Item(value));
+        this.addItem(boiler.dailyItem, new Item(value));
         return this;
     }
 }
