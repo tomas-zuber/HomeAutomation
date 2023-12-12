@@ -30,6 +30,8 @@ export const HEATER_POWER_LIMIT = -600;
 export const BOILER_AUTO = "Switch2_auto"; // ON/OFF
 export const BOILER_SWITCH = "shellyplugs2__1921680204_Power"; // ON/OFF
 export const BOILER_POWER_LIMIT = -800;
+export const BOILER_DAILY_USAGE = "Plug2_daily_powerOn"; // minutes
+export const BOILER_DAILY_USAGE_MAX = 180; // minutes
 
 export const ON = "ON";
 export const OFF = "OFF";
@@ -93,6 +95,12 @@ function updateBoiler(items, power) {
     const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
     console.log("boiler %s %s %s", boilerStatus, boilerAuto, power)
     if (boilerAuto === ON) {
+        if (items.getItem(BOILER_DAILY_USAGE).rawState >= BOILER_DAILY_USAGE_MAX) {
+            if (boilerStatus === ON) {
+                return switchBoiler(items, OFF);
+            }
+            return 0
+        }
         if (power <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
             return switchBoiler(items, ON);
         } else if (power > POWER_MAX_CONSUMPTION && boilerStatus === ON) {

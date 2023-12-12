@@ -6,6 +6,7 @@ import {
     HEATER_SWITCH,
     BOILER_AUTO,
     BOILER_SWITCH,
+    BOILER_DAILY_USAGE,
     OFF,
     POWER_SUM
 } from "./heating_rules";
@@ -26,6 +27,7 @@ export class ItemMap {
         this.heaterAuto(OFF)
         this.boilerStatus(OFF)
         this.boilerAuto(OFF)
+        this.boilerDailyUsage(0)
     }
 
     addItem(name, value) {
@@ -72,6 +74,11 @@ export class ItemMap {
 
     boilerAuto(value) {
         this.addItem(BOILER_AUTO, new Item(value));
+        return this;
+    }
+
+    boilerDailyUsage(value) {
+        this.addItem(BOILER_DAILY_USAGE, new Item(value));
         return this;
     }
 }
