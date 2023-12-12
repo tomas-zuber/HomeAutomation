@@ -18,6 +18,72 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 export const POWER_SUM = "PowerSum";
 export const POWER_MAX_CONSUMPTION = 0;
 
+class Heating {
+    constructor(name, switchItem, statusItem, autoItem, limit, dailyItem = null, dailyLimit = null) {
+        this.name = name
+        this.switchItem = switchItem
+        this.statusItem = statusItem // ON/OFF
+        this.autoItem = autoItem // ON/OFF
+        this.limit = limit // watt
+        this.dailyItem = dailyItem
+        this.dailyLimit = dailyLimit // minutes
+    }
+
+    change(items, status) {
+        let heatSwitch = items.getItem(this.switchItem);
+        heatSwitch.sendCommand(status);
+        return this.limit * (status === ON ? -1 : 1)
+    }
+
+    update(items, power) {
+        const status = items.getItem(this.statusItem).rawState.toString();
+        const autoStatus = items.getItem(this.autoItem).rawState.toString();
+        console.log("%s status:%s; auto:%s; power:%s", this.name, status, autoStatus, power)
+        if (autoStatus === ON) {
+            if (this.dailyItem != null && items.getItem(this.dailyItem).rawState >= this.dailyLimit) {
+                if (status === ON) {
+                    return this.change(items, OFF);
+                }
+                return 0
+            }
+
+            if (power <= this.limit && status === OFF) {
+                return this.change(items, ON);
+            } else if (power > POWER_MAX_CONSUMPTION && status === ON) {
+                return this.change(items, OFF);
+            }
+        } else {
+            if (status === ON) {
+                return this.change(items, OFF);
+            }
+        }
+        return 0;
+    }
+}
+
+export const ventilation = new Heating(
+    "ventilation",
+    "Rekup_heat_switch",
+    "Rekup_heat_status",
+    "Rekup_heat_auto",
+    -500)
+
+export const radiator = new Heating(
+    "radiator",
+    "shellyplug__1921680202_Power",
+    "shellyplug__1921680202_Power",
+    "Switch1_auto",
+    -600)
+
+export const boiler = new Heating(
+    "boiler",
+    "shellyplugs2__1921680204_Power",
+    "shellyplugs2__1921680204_Power",
+    "Switch2_auto",
+    -800,
+    "Plug2_daily_powerOn",
+    180)
+
 export const AIR_HEAT_STATUS = "Rekup_heat_status"; // ON/OFF
 export const AIR_HEAT_AUTO = "Rekup_heat_auto"; // ON/OFF
 export const AIR_HEAT_SWITCH = "Rekup_heat_switch"; // toggle
@@ -36,93 +102,15 @@ export const BOILER_DAILY_USAGE_MAX = 180; // minutes
 export const ON = "ON";
 export const OFF = "OFF";
 
-function switchAirHeat(items, status) {
-    let airHeatSwitch = items.getItem(AIR_HEAT_SWITCH);
-    airHeatSwitch.sendCommand(status);
-    return AIR_POWER_LIMIT * (status === ON ? -1 : 1)
-}
-
-function switchHeater(items, status) {
-    let heaterSwitch = items.getItem(HEATER_SWITCH);
-    heaterSwitch.sendCommand(status);
-    return HEATER_POWER_LIMIT * (status === ON ? -1 : 1)
-}
-
-function switchBoiler(items, status) {
-    let boilerSwitch = items.getItem(BOILER_SWITCH);
-    boilerSwitch.sendCommand(status);
-    return BOILER_POWER_LIMIT * (status === ON ? -1 : 1)
-}
-
-function updateAir(items, power) {
-    const airHeatStatus = items.getItem(AIR_HEAT_STATUS).rawState.toString();
-    const airHeatAuto = items.getItem(AIR_HEAT_AUTO).rawState.toString();
-    console.log("air %s %s %s", airHeatStatus, airHeatAuto, power)
-    if (airHeatAuto === ON) {
-        if (power <= AIR_POWER_LIMIT && airHeatStatus === OFF) {
-            return switchAirHeat(items, ON);
-        } else if (power > POWER_MAX_CONSUMPTION && airHeatStatus === ON) {
-            return switchAirHeat(items, OFF);
-        }
-    } else {
-        if (airHeatStatus === ON) {
-            return switchAirHeat(items, OFF);
-        }
-    }
-    return 0;
-}
-
-function updateHeater(items, power) {
-    const heaterStatus = items.getItem(HEATER_SWITCH).rawState.toString();
-    const heaterAuto = items.getItem(HEATER_AUTO).rawState.toString();
-    console.log("heater %s %s %s", heaterStatus, heaterAuto, power)
-    if (heaterAuto === ON) {
-        if (power <= HEATER_POWER_LIMIT && heaterStatus === OFF) {
-            return switchHeater(items, ON);
-        } else if (power > POWER_MAX_CONSUMPTION && heaterStatus === ON) {
-            return switchHeater(items, OFF);
-        }
-    } else {
-        if (heaterStatus === ON) {
-            return switchHeater(items, OFF);
-        }
-    }
-    return 0;
-}
-
-function updateBoiler(items, power) {
-    const boilerStatus = items.getItem(BOILER_SWITCH).rawState.toString();
-    const boilerAuto = items.getItem(BOILER_AUTO).rawState.toString();
-    console.log("boiler %s %s %s", boilerStatus, boilerAuto, power)
-    if (boilerAuto === ON) {
-        if (items.getItem(BOILER_DAILY_USAGE).rawState >= BOILER_DAILY_USAGE_MAX) {
-            if (boilerStatus === ON) {
-                return switchBoiler(items, OFF);
-            }
-            return 0
-        }
-        if (power <= BOILER_POWER_LIMIT && boilerStatus === OFF) {
-            return switchBoiler(items, ON);
-        } else if (power > POWER_MAX_CONSUMPTION && boilerStatus === ON) {
-            return switchBoiler(items, OFF);
-        }
-    } else {
-        if (boilerStatus === ON) {
-            return switchBoiler(items, OFF);
-        }
-    }
-    return 0;
-}
-
 export function updateHeating(items) {
     let powerSum = items.getItem(POWER_SUM).rawState
     if (powerSum > POWER_MAX_CONSUMPTION) { // reverse order of turning off
-        powerSum += updateBoiler(items, powerSum);
-        powerSum += updateHeater(items, powerSum);
-        updateAir(items, powerSum);
+        powerSum += boiler.update(items, powerSum);
+        powerSum += radiator.update(items, powerSum);
+        ventilation.update(items, powerSum);
     } else {
-        powerSum += updateAir(items, powerSum);
-        powerSum += updateHeater(items, powerSum);
-        updateBoiler(items, powerSum);
+        powerSum += ventilation.update(items, powerSum);
+        powerSum += radiator.update(items, powerSum);
+        boiler.update(items, powerSum);
     }
 }
