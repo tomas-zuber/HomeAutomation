@@ -6,10 +6,11 @@ import {
     AIR_POWER_LIMIT,
     HEATER_POWER_LIMIT,
     BOILER_POWER_LIMIT,
+    BOILER_DAILY_USAGE_MAX,
     OFF,
     ON,
     POWER_MAX_CONSUMPTION,
-    updateHeating
+    updateHeating,
 } from "../heating_rules";
 import {describe, expect, it} from '@jest/globals';
 
@@ -21,6 +22,7 @@ const HEATER_LOW_POWER = HEATER_POWER_LIMIT + 1
 
 const BOILER_OK_POWER = BOILER_POWER_LIMIT
 const BOILER_LOW_POWER = BOILER_POWER_LIMIT + 1
+const BOILER_DAILY_REACHED = BOILER_DAILY_USAGE_MAX + 1
 
 const CONSUMING_POWER = POWER_MAX_CONSUMPTION + 1
 
@@ -92,6 +94,10 @@ describe('updateHeating tests', () => {
             [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(OFF), false, OFF],
             [itemMap(BOILER_OK_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
             [itemMap(CONSUMING_POWER).boilerAuto(OFF).boilerStatus(ON), true, OFF],
+
+            // daily usage
+            [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(OFF).boilerDailyUsage(BOILER_DAILY_REACHED), false, OFF],
+            [itemMap(BOILER_OK_POWER).boilerAuto(ON).boilerStatus(ON).boilerDailyUsage(BOILER_DAILY_REACHED), true, OFF],
         ])('updateHeating for boiler %p updated %p and status %p', (items, updated, newState) => {
             updateHeating(items)
 
