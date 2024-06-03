@@ -3,7 +3,8 @@ import {
     boiler,
     ventilation,
     OFF,
-    POWER_SUM
+    POWER_SUM,
+    AUTO_ORDERING
 } from "./heating_rules";
 import {jest} from "@jest/globals";
 
@@ -12,6 +13,7 @@ export class ItemMap {
 
     constructor(power = 0) {
         this.power(power)
+        this.ordering(ventilation.name, radiator.name, boiler.name)
         let airHeatSwitch = new Item();
         airHeatSwitch.spy = jest.spyOn(airHeatSwitch, 'sendCommand')
         this.addItem(ventilation.switchItem, airHeatSwitch);
@@ -35,6 +37,11 @@ export class ItemMap {
 
     power(value) {
         this.addItem(POWER_SUM, new Item(value));
+        return this;
+    }
+
+    ordering(value) {
+        this.addItem(AUTO_ORDERING, new Item(value));
         return this;
     }
 

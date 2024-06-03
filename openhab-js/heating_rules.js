@@ -17,6 +17,8 @@ Switch1_auto (Type=StringItem, State=OFF, Label=Switch1_auto, Category=)
 * */
 export const POWER_SUM = "PowerSum";
 export const POWER_MAX_CONSUMPTION = 0;
+export const POWER_BUFFER_PER_ITEM = 0;
+export const AUTO_ORDERING = "AutoOrdering";
 
 class Heating {
     constructor(name, switchItem, statusItem, autoItem, consumption, dailyItem = null, dailyLimit = null) {
@@ -88,7 +90,10 @@ export const ON = "ON";
 export const OFF = "OFF";
 
 export function updateHeating(items) {
-    let powerSum = items.getItem(POWER_SUM).rawState
+    let ordering = items.getItem(AUTO_ORDERING).rawState.toString().trim().split(" ");
+    let turnedOnSize = ordering.length
+    let powerSum = items.getItem(POWER_SUM).rawState + (turnedOnSize * POWER_BUFFER_PER_ITEM) // TODO
+
     if (powerSum > POWER_MAX_CONSUMPTION) { // reverse order of turning off
         powerSum += boiler.update(items, powerSum);
         powerSum += radiator.update(items, powerSum);
